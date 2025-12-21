@@ -60,3 +60,6 @@ typings/
 
 # next.js build output
 .next
+
+# Rest API Client
+test.http
