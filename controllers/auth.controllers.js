@@ -25,7 +25,7 @@ export const signUp = async (req, res, next) => {
 
          const newUser = await User.create([{name, email, password: hashedPass}], { session });
 
-         const token = jwt.sign({userId: newUser[0]._id}, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+         const token = jwt.sign({ userId: newUser[0]._id, userRole: newUser[0].role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
         await session.commitTransaction();
         session.endSession();
@@ -63,11 +63,11 @@ export const signIn = async (req, res, next) => {
 
         if(!isPassword) {
             const error = new Error('Invalid password');
-            error.statusCode = 401;
+            error.statusCode = 400;
             throw error;
         }
 
-        const token = jwt.sign({userId: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN});
+        const token = jwt.sign({ userId: user._id, userRole: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN});
 
         res.status(200).json({
             success: true,
