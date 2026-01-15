@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/env.js';
 import User from '../models/user.model.js';
 
-const authorization = async (req, res, next) => {
+export const authenticate = async (req, res, next) => {
     try {
         let token, validId;
 
@@ -10,7 +10,7 @@ const authorization = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
         }
 
-        if(!token) return res.status(401).json({ success: false, message: 'No tokrn, Unauthorized'});
+        if(!token) return res.status(401).json({ success: false, message: 'Unauthorized'});
 
         const verifiedToken = jwt.verify(token, JWT_SECRET);
 
@@ -30,4 +30,14 @@ const authorization = async (req, res, next) => {
     }
 }
 
-export default authorization;
+export const authorize = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.user.role)) {
+            res.status(403).json({
+                success: false,
+                message: "Access denied"
+            })
+        }
+        next();
+    }
+}

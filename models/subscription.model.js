@@ -63,41 +63,36 @@ const subscriptionSchema = mongoose.Schema({
 }, {timestamps: true});
 
 //This function runs before saving the document
-subscriptionSchema.pre('save', function (next){
+subscriptionSchema.pre('save', async function(next){
     //Check if there is no renewal date
-    if(!this.renewalDate){
-        // const renewalPeriods = {
-        //     daily: 1, weekly: 7, monthly: 30, yearly: 365
-        // };
+        if(!this.renewalDate){
 
         this.renewalDate = new Date(this.startDate);
 
         switch(this.frequency){
             case 'daily':
-                renewalDate.setDate(this.renewalDate.getDate() + 1);
+                this.renewalDate.setDate(this.renewalDate.getDate() + 1);
                 break;
             case 'weekly':
-                renewalDate.setDate(this.renewalDate.getDate() + 7);
+                this.renewalDate.setDate(this.renewalDate.getDate() + 7);
                 break;
             case 'monthly':
-                renewalDate.setMonth(this.renewalDate.getMonth() + 1);
+                this.renewalDate.setMonth(this.renewalDate.getMonth() + 1);
                 break;
-            case 'daily':
-                renewalDate.setFullYear(this.renewalDate.getFullYear() + 1);
+            case 'yearly':
+                this.renewalDate.setFullYear(this.renewalDate.getFullYear() + 1);
                 break;
             default:
                 return next(new Error('Invalid subscription type'));
         }
 
-        this.renewalDate = renewalDate;
+        this.renewalDate = this.renewalDate;
     }
 
     //Auto-update status if renewal date has passed
-    if (this.renewalDate < new Date()) {
-        this.status = 'expired';
-    }
-
-    next();
+    // if (this.renewalDate < new Date()) {
+    //     this.status = 'expired';
+    // }
 });
 
 const Subscription = mongoose.model('Subscription', subscriptionSchema);
