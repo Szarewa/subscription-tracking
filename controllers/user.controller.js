@@ -26,10 +26,10 @@ export const getUser = async (req, res, next) => {
         if(!user) {
             const error = new Error('User not found');
             error.statusCode = 404;
-            throw error;
+            return next(error);
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: user
         })
